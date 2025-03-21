@@ -6,8 +6,10 @@ import Container from "react-bootstrap/Container";
 function App() {
   return (
     <div className="app-container">
-        <Header></Header>
+      <Header></Header>
+      <Container>
         <TableUsers></TableUsers>
+      </Container>
     </div>
   );
 }
