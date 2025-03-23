@@ -5,7 +5,8 @@ import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditUser from "./ModalEditUser";
 import ModalConfirm from "./ModalConfirm";
-import _, { clone } from "lodash";
+import _ from "lodash";
+import "./TableUser.scss";
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -17,10 +18,13 @@ const TableUsers = (props) => {
   const [dataUserDelete, setDataUserDelete] = useState({});
 
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+  const [sortBy, setSortBy] = useState("asc");
+  const [sortField, setSortField] = useState("id");
+
   const handleClose = () => {
     setIsShowModalAddNew(false);
     setIsShowModalEdit(false);
-    setIsShowModalDelete(false)
+    setIsShowModalDelete(false);
   };
 
   const handleUpdateTable = (user) => {
@@ -56,16 +60,25 @@ const TableUsers = (props) => {
     getUsers(+event.selected + 1);
   };
 
-  const handleDeleteUser=(user)=>{
-    setIsShowModalDelete(true)
-    setDataUserDelete(user)
-  }
+  const handleDeleteUser = (user) => {
+    setIsShowModalDelete(true);
+    setDataUserDelete(user);
+  };
 
-  const handleDeleteUserFromModal=(user)=>{
+  const handleDeleteUserFromModal = (user) => {
     let cloneListUsers = _.cloneDeep(listUsers);
-    cloneListUsers = cloneListUsers.filter(item=>item.id !== user.id)
+    cloneListUsers = cloneListUsers.filter((item) => item.id !== user.id);
 
     setListUsers(cloneListUsers);
+  };
+
+  const handleSort =(sortBy,sortField)=>{
+    setSortBy(sortBy)
+    setSortField(sortField)
+
+    let cloneListUsers = _.cloneDeep(listUsers);
+    cloneListUsers =_.orderBy(cloneListUsers,[sortField],[sortBy])
+    setListUsers(cloneListUsers)
   }
 
   return (
@@ -82,9 +95,37 @@ const TableUsers = (props) => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>
+              <div className="sort_header">
+                <span>ID</span>
+                <span>
+                  <i
+                    className="fa-solid fa-arrow-down"
+                    onClick={() => handleSort("desc","id")}
+                  ></i>
+                  <i
+                    className="fa-solid fa-arrow-up"
+                    onClick={() => handleSort("asc","id")}
+                  ></i>
+                </span>
+              </div>
+            </th>
             <th>Email</th>
-            <th>First name</th>
+            <th>
+              <div className="sort_header">
+                <span>First name </span>
+                <span>
+                  <i
+                    className="fa-solid fa-arrow-down"
+                    onClick={() => handleSort("desc","first_name")}
+                  ></i>
+                  <i
+                    className="fa-solid fa-arrow-up"
+                    onClick={() => handleSort("asc","first_name")}
+                  ></i>
+                </span>
+              </div>
+            </th>
             <th>Last name</th>
             <th>Actions</th>
           </tr>
@@ -101,13 +142,17 @@ const TableUsers = (props) => {
                   <td>{item.last_name}</td>
                   <td>
                     <button
-                  
                       className="btn btn-warning mx-3"
                       onClick={() => handleEditUser(item)}
                     >
                       Edit
                     </button>
-                    <button className="btn btn-danger" onClick={()=>handleDeleteUser(item)}>Delete</button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDeleteUser(item)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               );
