@@ -3,6 +3,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import logoApp from "../assets/images/logo192.png";
+import { NavLink } from "react-router-dom";
 const Header = (props) => {
     return (
         <>
@@ -19,14 +20,17 @@ const Header = (props) => {
                         <span>Vu Duc Anh's App</span>
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto" activeKey={"/users"}>
-                            <Nav.Link href="/">Home</Nav.Link>
-                            <Nav.Link href="/users">Manage Users</Nav.Link>
-                            <NavDropdown
-                                title="Setting"
-                                id="basic-nav-dropdown"
-                            >
+                    <Navbar.Collapse id="basic-navbar-nav ">
+                        <Nav className="me-auto ">
+                            <NavLink to="/" className="nav-link">
+                                Home
+                            </NavLink>
+                            <NavLink to="/users" className="nav-link">
+                                Manager Users
+                            </NavLink>
+                        </Nav>
+                        <Nav>
+                            <NavDropdown title="Setting">
                                 <NavDropdown.Item href="/login">
                                     Login
                                 </NavDropdown.Item>
