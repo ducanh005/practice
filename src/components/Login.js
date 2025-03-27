@@ -1,22 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
 import { loginApi } from "../services/UserService";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import {Link,useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 const Login = () => {
-    const navigate = useNavigate()
+    const { loginContext } = useContext(UserContext);
+
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isShowPassword, setIsShowPassword] = useState(true);
 
     const [loadingAPI, setLoadingAPI] = useState(false);
 
-    useEffect(()=>{
-        let token = localStorage.getItem("token");
-        if(token){
-            navigate("/")
-        }
-    },[])
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -26,8 +23,9 @@ const Login = () => {
         setLoadingAPI(true);
         let res = await loginApi(email, password);
         if (res && res.token) {
-            localStorage.setItem("token", res.token);
-            navigate("/")
+            loginContext(email,res.token)
+
+            navigate("/");
         } else {
             if (res && res.status === 400) {
                 toast.error(res.data.error);
@@ -35,6 +33,10 @@ const Login = () => {
         }
         setLoadingAPI(false);
     };
+
+    const handleGoBack =()=>{
+        navigate("/")
+    }
     return (
         <div className="login-container col-12 col-sm-4">
             <div className="title ">Login</div>
@@ -63,7 +65,7 @@ const Login = () => {
             </div>
             <button
                 className={email && password ? "active" : ""}
-                disabled={email && password  ? false : true}
+                disabled={email && password ? false : true}
                 onClick={() => handleLogin()}
             >
                 {loadingAPI && <i className="fa-solid fa-sync fa-spin"></i>}{" "}
@@ -71,7 +73,8 @@ const Login = () => {
             </button>
             <div className="back">
                 {" "}
-                <i className="fa-solid fa-arrow-left"></i> Go back
+                <i className="fa-solid fa-arrow-left"></i>
+                    <span onClick={()=>handleGoBack()}>&nbsp;Go back</span>
             </div>
         </div>
     );
