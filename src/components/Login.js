@@ -1,42 +1,42 @@
-import { useEffect, useState,useContext } from "react";
-import { loginApi } from "../services/UserService";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {Link,useNavigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
+import { Link, useNavigate } from "react-router-dom";
+import { handleLoginRedux } from "../redux/action/userAction";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
-    const { loginContext } = useContext(UserContext);
-
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isShowPassword, setIsShowPassword] = useState(true);
 
-    const [loadingAPI, setLoadingAPI] = useState(false);
-
+    const isLoading = useSelector((state) => state.user.isLoading);
+    const account = useSelector((state) => state.user.account);
 
     const handleLogin = async () => {
         if (!email || !password) {
             toast.error("Email or Password is equired!");
             return;
         }
-        setLoadingAPI(true);
-        let res = await loginApi(email, password);
-        if (res && res.token) {
-            loginContext(email,res.token)
-
-            navigate("/");
-        } else {
-            if (res && res.status === 400) {
-                toast.error(res.data.error);
-            }
-        }
-        setLoadingAPI(false);
+        dispatch(handleLoginRedux(email, password));
     };
 
-    const handleGoBack =()=>{
-        navigate("/")
-    }
+    const handleGoBack = () => {
+        navigate("/");
+    };
+
+    const handlePressEnter = (event) => {
+        if (event && event.key === "Enter") {
+            handleLogin();
+        }
+    };
+
+    useEffect(() => {
+        if (account && account.auth === true) {
+            navigate("/");
+        }
+    }, [account]);
     return (
         <div className="login-container col-12 col-sm-4">
             <div className="title ">Login</div>
@@ -53,6 +53,7 @@ const Login = () => {
                     placeholder="Password..."
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
+                    onKeyDown={(event) => handlePressEnter(event)}
                 ></input>
                 <i
                     className={
@@ -68,13 +69,13 @@ const Login = () => {
                 disabled={email && password ? false : true}
                 onClick={() => handleLogin()}
             >
-                {loadingAPI && <i className="fa-solid fa-sync fa-spin"></i>}{" "}
+                {isLoading && <i className="fa-solid fa-sync fa-spin"></i>}{" "}
                 &nbsp;Login
             </button>
             <div className="back">
                 {" "}
                 <i className="fa-solid fa-arrow-left"></i>
-                    <span onClick={()=>handleGoBack()}>&nbsp;Go back</span>
+                <span onClick={() => handleGoBack()}>&nbsp;Go back</span>
             </div>
         </div>
     );
